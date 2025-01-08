@@ -1,0 +1,12 @@
+requests
+pandas
+jupyter
+scikit-learn
+graphviz
+matplotlib
+fasttext
+plotly
+adtk
+statsmodels
+pmdarima
+tqdm
