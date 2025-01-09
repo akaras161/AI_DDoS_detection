@@ -10,3 +10,4 @@ adtk
 statsmodels
 pmdarima
 tqdm
+seaborn
