@@ -1,0 +1,147 @@
+Ninejszy projekt został przygotowany w ramach zaliczenia przedmiotu Metody AI w badaniu zagrożeń w systemach komputerowych.
+
+Autorami projektu są:
+-Adrian Karaś, 259445@student.pwr.edu.pl
+-Mateusz Niestrój, 259487@student.pwr.edu.pl
+-Michał Niedzielski, 
+
+Założeniem projektu było stworzenie modelu do wykrywania ataków DDoS na podstawie netflow ruchu sieciowego.
+Dane wykorzystane podczas analizy, trenowania, dostrajania oraz testowania modelu pochodzą z następującego źródła: https://www.unb.ca/cic/datasets/ddos-2019.html
+Zostały zebrane oraz pogrupowane według rodzajów przeprowadzonycha ataków DDoS. Zawierają zarówno zrzuty ruchu normalnego "łagodnego" jak i ruchu złośliwego, który został w odpowiedni sposób otagowany.
+
+Projekt składa się z następujących plików:
+1) v1_unbalanced_data_set.ipynb
+2) v2_undersampling_data_set.ipynb
+3) v3_test_unbalanced_and_undersampling_on_new_data.ipynb
+4) v4_automated_feature_selection.ipynb
+5) unbalanced_model.pkl
+6) undersampling_model_auto_feature_selection.pkl
+7) undersampling_model.pkl
+
+Ad. 1.
+v1_unbalanced_data_set.ipynb to plik, w którym wytrenowany został model unbalanced_model.pkl (pkt 5). Bazuje on na danych bardzo niezbalansowanych, których rozkład prezentuje się następująco: [('BENIGN', 5124), ('LDAP', 1905191), ('NetBIOS', 202919)]. Model wykorzystuje cechy, które zostały dobrane ręcznie na podstawie wiedzy specjalistycznej oraz założeń autorów.
+
+Skuteczność badanego modelu na podzielonym zbiorze danych LDAP.csv wyniosła:
+
+        Accuracy: 0.9999550452268678
+                      precision    recall  f1-score   support
+        
+              BENIGN       1.00      1.00      1.00      1026
+                LDAP       1.00      1.00      1.00    381151
+             NetBIOS       1.00      1.00      1.00     40470
+        
+            accuracy                           1.00    422647
+           macro avg       1.00      1.00      1.00    422647
+        weighted avg       1.00      1.00      1.00    422647
+
+Najsilniejszymi cechami decydującymi były: Average Packet Size, Fwd Packet Len Max Flow Bytes/s.
+
+Ad. 2.
+v2_undersampling_data_set.ipynb to plik, w którym wytrenowany został model undersampling_model.pkl (pkt 7). Bazuje on na danych bardzo zbalansowanych, jednakże bardzo ograniczonych ilościowo, których rozkład prezentuje się następująco: [('BENIGN', 5000), ('LDAP', 2500), ('NetBIOS', 2500)]. Model wykorzystuje cechy, które zostały dobrane ręcznie na podstawie wiedzy specjalistycznej oraz założeń autorów.
+
+Skuteczność badanego modelu na podzielonym zbiorze danych LDAP.csv wyniosła:
+
+        Accuracy: 0.9995
+                  precision    recall  f1-score   support
+    
+          BENIGN       1.00      1.00      1.00      1012
+            LDAP       1.00      1.00      1.00       492
+         NetBIOS       1.00      1.00      1.00       496
+    
+        accuracy                           1.00      2000
+       macro avg       1.00      1.00      1.00      2000
+    weighted avg       1.00      1.00      1.00      2000
+
+Najsilniejszymi cechami decydującymi były: Average Packet Size, Fwd Packet Len Max Flow Bytes/s.
+
+Ad. 3.
+v3_test_unbalanced_and_undersampling_on_new_data.ipynb to plik, w którym poprzednio wytrenowane modele zostały przetestowane na nowych danych (NetBIOS.csv), do których wcześniej nie miały dostępu. Nowe dane skłądały się z: [('BENIGN', 1321), ('NetBIOS', 3454578)]. Zadaniem każdego z modeli było zklasyfikowanie ruchu jako łagodnego lub atakujacego.
+
+Model unbalanced_model.pkl (pkt. 5) osiągnął bardzo złe wyniki:
+
+        Accuracy: 0.005047890577820706
+        
+        Classification Report:
+                      precision    recall  f1-score   support
+        
+              BENIGN       0.57      0.98      0.72      1321
+                LDAP       0.00      1.00      0.00         0
+             NetBIOS       1.00      0.00      0.01   3454578
+        
+            accuracy                           0.01   3455899
+           macro avg       0.52      0.66      0.24   3455899
+        weighted avg       1.00      0.01      0.01   3455899
+
+Model undersampling_model.pkl (pkt. 7) osiągną wyniki lepsze niż poprzednik, jednakże w dalszym ciągu nie były one zadowalające:
+
+        Accuracy: 0.5208815419663595
+        
+        Classification Report:
+                      precision    recall  f1-score   support
+        
+              BENIGN       0.00      1.00      0.00      1321
+                LDAP       0.00      1.00      0.00         0
+             NetBIOS       1.00      0.52      0.68   3454578
+        
+            accuracy                           0.52   3455899
+           macro avg       0.33      0.84      0.23   3455899
+        weighted avg       1.00      0.52      0.68   3455899
+
+Ad. 4.
+W celu poprawy skuteczności modeli (pkt 1. oraz 2.) podjęto próbę wytrenowania nowego modelu, który bazować będzie na cechach wybranych automatycznie.
+v4_automated_feature_selection.ipynb to plik, w którym został wytrenowany oraz przetestowany model undersampling_model_auto_feature_selection.pkl (pkt 6).
+Model podobnie jak poprzedni został wytrenowany na danych pochodzących ze zbioru LDAP.csv. Jednakże w tym przypadku wykorzystany został SelectKBest do automatycznego wybrania 15 najlepszych cech, na którch model został wytrenowany.
+
+Skuteczność modelu na podzielonym zbiorze danych LDAP.csv wyniosła:
+
+        Accuracy: 1.0
+                      precision    recall  f1-score   support
+        
+              BENIGN       1.00      1.00      1.00      1012
+                LDAP       1.00      1.00      1.00       492
+             NetBIOS       1.00      1.00      1.00       496
+        
+            accuracy                           1.00      2000
+           macro avg       1.00      1.00      1.00      2000
+        weighted avg       1.00      1.00      1.00      2000
+
+Natomiast przetestowanie modelu na nowym zbiorze danych NetBIOS.csv wynioasła:
+
+        Accuracy: 0.9996958823160051
+        
+        Classification Report:
+                      precision    recall  f1-score   support
+        
+              BENIGN       0.58      1.00      0.73      1321
+                LDAP       0.00      1.00      0.00         0
+             NetBIOS       1.00      1.00      1.00   3454578
+        
+            accuracy                           1.00   3455899
+           macro avg       0.53      1.00      0.58   3455899
+        weighted avg       1.00      1.00      1.00   3455899
+
+Ważdność cech, na podstawie których podjęta została decyzja modelu prezentuje się następująco:
+
+        Feature  Importance
+        8         Min Packet Length    0.203812
+        13     Avg Fwd Segment Size    0.131528
+        12      Average Packet Size    0.130487
+        3     Fwd Packet Length Min    0.118375
+        10       Packet Length Mean    0.111065
+        4    Fwd Packet Length Mean    0.102168
+        9         Max Packet Length    0.086473
+        2     Fwd Packet Length Max    0.047441
+        5              Flow Bytes/s    0.028014
+        1                  Protocol    0.017393
+        14                  Inbound    0.009250
+        6            Flow Packets/s    0.005361
+        0               Source Port    0.005051
+        7             Fwd Packets/s    0.002224
+        11           URG Flag Count    0.001359
+
+
+Więcej szczegółowych informacji na temat obróbki danych oraz analizy wyników działania modeli dostępnych jest bezpośrednio w plikach 
+- v1_unbalanced_data_set.ipynb
+- v2_undersampling_data_set.ipynb
+- v3_test_unbalanced_and_undersampling_on_new_data.ipynb
+- v4_automated_feature_selection.ipynb
