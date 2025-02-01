@@ -1,5 +1,7 @@
 # AI_DDoS_detection
 
+v0_correlation - business and data understanding
+
 v1_unbalanced_data_set - model, w którym ruch łagodny stanowi ułamek całego ruchu.
                             Wytrenowany model zapisywany jest w pliku unbalancec_model.pkl
 
